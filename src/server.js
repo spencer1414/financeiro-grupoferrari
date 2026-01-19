@@ -519,8 +519,7 @@ app.use((req, res) => {
   res.status(404).render('error', { title: '404', message: 'Página não encontrada.', user: req.session.user || null });
 });
 
-const PORT = Number(process.env.PORT || 3000);
-app.listen(PORT, () => {
-  console.log(`Financeiro Rede rodando em http://localhost:${PORT}`);
-  console.log(`Banco JSON: ${DB_PATH}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Servidor rodando na porta:", PORT);
 });
