@@ -1,0 +1,30 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/nav') %>
+<div class="container py-4" style="max-width:720px">
+  <h3>Minha conta</h3>
+  <p class="text-muted">Trocar senha do usuário (<b><%= user.email %></b>).</p>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+  <% if (ok) { %>
+    <div class="alert alert-success"><%= ok %></div>
+  <% } %>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" action="/account/password">
+        <div class="mb-3">
+          <label class="form-label">Senha atual</label>
+          <input type="password" name="current_password" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Nova senha (mín. 8 caracteres)</label>
+          <input type="password" name="new_password" class="form-control" required>
+        </div>
+        <button class="btn btn-primary">Salvar</button>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

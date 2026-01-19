@@ -1,0 +1,134 @@
+<%- include('../partials/head', { title }) %>
+<%- include('../partials/nav') %>
+<div class="container py-4" style="max-width:980px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-0">Detalhes da conta</h3>
+      <small class="text-muted"><%= bill.store_name %> • Criado por <%= bill.created_by %></small>
+    </div>
+    <a class="btn btn-outline-secondary" href="/bills">Voltar</a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <div class="text-muted" style="font-size:13px">Débito</div>
+          <div class="fs-5"><b><%= bill.title %></b></div>
+          <% if (bill.reason) { %>
+            <div class="text-muted mt-1"><%= bill.reason %></div>
+          <% } %>
+        </div>
+        <div class="col-md-4">
+          <div class="text-muted" style="font-size:13px">Vencimento</div>
+          <div class="fs-5"><b><%= bill.due_date %></b></div>
+          <% if (bill.urgent_today) { %>
+            <span class="badge text-bg-danger mt-2">URGENTE (pagamento do dia)</span>
+          <% } %>
+        </div>
+
+        <div class="col-md-4">
+          <div class="text-muted" style="font-size:13px">Valor</div>
+          <div><%= formatMoneyBRL(bill.amount_cents) || '—' %></div>
+        </div>
+        <div class="col-md-4">
+          <div class="text-muted" style="font-size:13px">Forma de pagamento</div>
+          <div><b><%= bill.payment_method %></b></div>
+        </div>
+        <div class="col-md-4">
+          <div class="text-muted" style="font-size:13px">Status</div>
+          <% if (bill.status === 'OPEN') { %>
+            <span class="badge text-bg-warning">ABERTO</span>
+          <% } else if (bill.status === 'PAID') { %>
+            <span class="badge text-bg-success">PAGO</span>
+          <% } else { %>
+            <span class="badge text-bg-secondary">CANCELADO</span>
+          <% } %>
+          <% if (bill.paid_at) { %>
+            <div class="text-muted" style="font-size:13px">Pago em: <%= bill.paid_at %></div>
+          <% } %>
+        </div>
+
+        <% if (bill.barcode) { %>
+          <div class="col-md-12">
+            <div class="text-muted" style="font-size:13px">Código de barras</div>
+            <code><%= bill.barcode %></code>
+          </div>
+        <% } %>
+        <% if (bill.pix_key) { %>
+          <div class="col-md-12">
+            <div class="text-muted" style="font-size:13px">Chave Pix</div>
+            <code><%= bill.pix_key %></code>
+          </div>
+        <% } %>
+        <% if (bill.notes) { %>
+          <div class="col-md-12">
+            <div class="text-muted" style="font-size:13px">Observações</div>
+            <div><%= bill.notes %></div>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <% if (bill.status === 'OPEN') { %>
+          <form method="post" action="/bills/<%= bill.id %>/pay">
+            <button class="btn btn-success">Dar baixa (PAGO)</button>
+          </form>
+        <% } %>
+        <% if (user.role === 'ADMIN' || user.role === 'OWNER') { %>
+          <form method="post" action="/bills/<%= bill.id %>/cancel" onsubmit="return confirm('Cancelar esta conta?')">
+            <button class="btn btn-outline-danger">Cancelar</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mt-3">
+    <div class="card-body">
+      <h5 class="mb-3">Anexos (boletos / notas)</h5>
+
+      <form method="post" action="/bills/<%= bill.id %>/attach" enctype="multipart/form-data" class="mb-3">
+        <div class="row g-2">
+          <div class="col-md-9">
+            <input class="form-control" type="file" name="attachment" required>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary w-100">Anexar</button>
+          </div>
+        </div>
+      </form>
+
+      <% if (attachments.length === 0) { %>
+        <div class="text-muted">Nenhum anexo ainda.</div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Arquivo</th>
+                <th>Tamanho</th>
+                <th>Data</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% attachments.forEach(a => { %>
+                <tr>
+                  <td><%= a.original_name %></td>
+                  <td><%= Math.round(a.size_bytes/1024) %> KB</td>
+                  <td><%= a.created_at %></td>
+                  <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" target="_blank" href="/uploads/<%= a.storage_name %>">Abrir</a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+<%- include('../partials/foot') %>

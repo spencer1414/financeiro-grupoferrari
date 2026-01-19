@@ -1,0 +1,70 @@
+<%- include('../partials/head', { title }) %>
+<%- include('../partials/nav') %>
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h3 class="mb-0">Contas a pagar</h3>
+      <small class="text-muted">Organizado por vencimento.</small>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-primary" href="/bills/new">Cadastrar conta</a>
+      <a class="btn btn-outline-secondary" href="/history">Histórico</a>
+    </div>
+  </div>
+
+  <% function section(title, arr, badgeClass){ %>
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><%= title %></h5>
+          <span class="badge <%= badgeClass %>"><%= arr.length %></span>
+        </div>
+
+        <% if (arr.length === 0) { %>
+          <div class="text-muted mt-3">—</div>
+        <% } else { %>
+          <div class="table-responsive mt-3">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Débito</th>
+                  <th>Vencimento</th>
+                  <th>Valor</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% arr.forEach(b => { %>
+                  <tr>
+                    <td><%= b.store_name %></td>
+                    <td>
+                      <%= b.title %>
+                      <% if (b.urgent_today) { %>
+                        <span class="badge text-bg-danger ms-2">URG</span>
+                      <% } %>
+                    </td>
+                    <td><%= b.due_date %></td>
+                    <td><%= formatMoneyBRL(b.amount_cents) %></td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/bills/<%= b.id %>">Ver</a></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <%- section('Vence hoje', organized.today, 'text-bg-danger') %>
+  <%- section('Próximos 2 dias', organized.in2days, 'text-bg-warning') %>
+  <%- section('Em até 5 dias', organized.in5days, 'text-bg-warning') %>
+  <%- section('Em até 10 dias', organized.in10days, 'text-bg-info') %>
+  <%- section('Em até 15 dias', organized.in15days, 'text-bg-info') %>
+  <%- section('Em até 30 dias', organized.in30days, 'text-bg-primary') %>
+  <%- section('Em até 60 dias', organized.in60days, 'text-bg-secondary') %>
+  <%- section('Vencidas', organized.overdue, 'text-bg-danger') %>
+  <%- section('Mais pra frente', organized.later, 'text-bg-light') %>
+</div>
+<%- include('../partials/foot') %>

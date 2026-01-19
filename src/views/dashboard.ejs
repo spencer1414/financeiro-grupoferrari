@@ -1,0 +1,89 @@
+<%- include('partials/head', { title: 'Painel' }) %>
+<%- include('partials/nav') %>
+
+<div class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="h4 m-0">Painel de vencimentos</h1>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary btn-sm" href="/export.xlsx">Exportar Excel</a>
+      <a class="btn btn-primary btn-sm" href="/bills/new">+ Nova conta</a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-12">
+      <div class="card border-danger">
+        <div class="card-header bg-danger text-white">Lembretes (vence hoje / até 2 dias / urgente)</div>
+        <div class="card-body">
+          <% if (!reminders || reminders.length === 0) { %>
+            <div class="text-muted">Nenhuma conta urgente no momento.</div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Loja</th>
+                    <th>Débito</th>
+                    <th>Venc.</th>
+                    <th>Valor</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% reminders.forEach(b => { %>
+                    <tr class="<%= b.urgent_today ? 'table-warning' : '' %>">
+                      <td><%= b.store_name %></td>
+                      <td><%= b.title %></td>
+                      <td>
+                        <span class="badge bg-dark"><%= b.due_date %></span>
+                        <% if (b.urgent_today) { %><span class="badge bg-danger ms-1">URGENTE HOJE</span><% } %>
+                      </td>
+                      <td><%= centsToBRL(b.amount_cents) %></td>
+                      <td><a class="btn btn-sm btn-outline-primary" href="/bills/<%= b.id %>">Abrir</a></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <% const order = ['ATRASADO','VENCE_HOJE','ATE_2_DIAS','ATE_5_DIAS','ATE_10_DIAS','ATE_15_DIAS','ATE_30_DIAS','ATE_60_DIAS','MAIS_60_DIAS']; %>
+    <% order.forEach(bucket => { %>
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <strong><%= bucketLabel(bucket) %></strong>
+            <span class="badge bg-secondary"><%= (grouped[bucket] || []).length %></span>
+          </div>
+          <div class="card-body">
+            <% if (!grouped[bucket] || grouped[bucket].length === 0) { %>
+              <div class="text-muted">Nenhuma conta nesta faixa.</div>
+            <% } else { %>
+              <div class="list-group">
+                <% grouped[bucket].forEach(b => { %>
+                  <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="/bills/<%= b.id %>">
+                    <div>
+                      <div class="fw-semibold"><%= b.title %></div>
+                      <div class="small text-muted"><%= b.store_name %> • Venc.: <%= b.due_date %></div>
+                    </div>
+                    <div class="text-end">
+                      <div><%= centsToBRL(b.amount_cents) %></div>
+                      <% if (b.urgent_today) { %><span class="badge bg-danger">URGENTE</span><% } %>
+                    </div>
+                  </a>
+                <% }) %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,65 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/nav') %>
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h3 class="mb-0">Histórico mensal</h3>
+      <small class="text-muted">Veja contas por mês e exporte para Excel.</small>
+    </div>
+    <a class="btn btn-primary" href="/export.xlsx?month=<%= month %>">Exportar Excel</a>
+  </div>
+
+  <form method="get" action="/history" class="row g-2 align-items-end mb-3" style="max-width:520px">
+    <div class="col-8">
+      <label class="form-label">Mês (YYYY-MM)</label>
+      <input class="form-control" name="month" value="<%= month %>" placeholder="2026-01">
+    </div>
+    <div class="col-4">
+      <button class="btn btn-outline-secondary w-100">Filtrar</button>
+    </div>
+  </form>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <% if (items.length === 0) { %>
+        <div class="text-muted">Nenhum registro para este mês.</div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Loja</th>
+                <th>Débito</th>
+                <th>Vencimento</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% items.forEach(b => { %>
+                <tr>
+                  <td><%= b.store_name %></td>
+                  <td><%= b.title %></td>
+                  <td><%= b.due_date %></td>
+                  <td><%= formatMoneyBRL(b.amount_cents) %></td>
+                  <td>
+                    <% if (b.status === 'OPEN') { %>
+                      <span class="badge text-bg-warning">ABERTO</span>
+                    <% } else if (b.status === 'PAID') { %>
+                      <span class="badge text-bg-success">PAGO</span>
+                    <% } else { %>
+                      <span class="badge text-bg-secondary">CANCELADO</span>
+                    <% } %>
+                  </td>
+                  <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/bills/<%= b.id %>">Ver</a></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

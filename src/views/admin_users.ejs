@@ -1,0 +1,85 @@
+<%- include('partials/head', { title: 'Admin - Usuários' }) %>
+<%- include('partials/nav') %>
+
+<div class="container py-4" style="max-width: 1100px;">
+  <h1 class="h4 mb-3">Admin • Usuários</h1>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+  <% if (info) { %>
+    <div class="alert alert-success"><%= info %></div>
+  <% } %>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-header">Criar usuário</div>
+    <div class="card-body">
+      <form class="row g-2" method="post" action="/admin/users">
+        <div class="col-12 col-md-3">
+          <label class="form-label">Nome</label>
+          <input class="form-control" name="name" required />
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Email (login)</label>
+          <input class="form-control" name="email" type="email" required />
+        </div>
+        <div class="col-12 col-md-2">
+          <label class="form-label">Perfil</label>
+          <select class="form-select" name="role" required>
+            <option value="MANAGER">MANAGER (Loja)</option>
+            <option value="OWNER">OWNER (Patrão)</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Loja (se MANAGER)</label>
+          <select class="form-select" name="store_id">
+            <option value="">—</option>
+            <% stores.forEach(s => { %>
+              <option value="<%= s.id %>"><%= s.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-12 col-md-1 d-flex align-items-end">
+          <button class="btn btn-primary w-100" type="submit">Criar</button>
+        </div>
+      </form>
+      <div class="form-text mt-2">O sistema cria uma senha temporária e envia por email (se SMTP estiver configurado) ou imprime no console.</div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header">Usuários</div>
+    <div class="card-body table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>ID</th><th>Nome</th><th>Email</th><th>Perfil</th><th>Loja</th><th>Status</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(u => { %>
+            <tr>
+              <td><%= u.id %></td>
+              <td><%= u.name %></td>
+              <td><%= u.email %></td>
+              <td><span class="badge bg-dark"><%= u.role %></span></td>
+              <td><%= u.store_name || '-' %></td>
+              <td><span class="badge <%= u.is_active ? 'bg-success' : 'bg-secondary' %>"><%= u.is_active ? 'ATIVO' : 'INATIVO' %></span></td>
+              <td class="d-flex gap-2">
+                <form method="post" action="/admin/users/<%= u.id %>/reset-password" class="m-0">
+                  <button class="btn btn-sm btn-outline-primary" type="submit">Reset senha</button>
+                </form>
+                <form method="post" action="/admin/users/<%= u.id %>/toggle" class="m-0">
+                  <button class="btn btn-sm btn-outline-warning" type="submit"><%= u.is_active ? 'Desativar' : 'Ativar' %></button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

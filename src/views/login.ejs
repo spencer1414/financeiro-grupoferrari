@@ -1,0 +1,27 @@
+<%- include('partials/head', { title }) %>
+<div class="container" style="max-width:520px; padding-top:80px">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-1">Entrar</h3>
+      <p class="text-muted mb-4">Acesse com seu e-mail e senha.</p>
+
+      <% if (error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form method="post" action="/login">
+        <div class="mb-3">
+          <label class="form-label">E-mail</label>
+          <input name="email" type="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Senha</label>
+          <input name="password" type="password" class="form-control" required>
+        </div>
+        <button class="btn btn-primary w-100">Entrar</button>
+      </form>
+    </div>
+  </div>
+  <p class="text-muted mt-3" style="font-size:13px">Primeiro acesso: o Admin inicial é criado automaticamente (ver o terminal) ou configure SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD no .env.</p>
+</div>
+<%- include('partials/foot') %>

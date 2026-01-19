@@ -1,0 +1,89 @@
+<%- include('partials/head', { title: mode==='create' ? 'Nova conta' : 'Editar conta' }) %>
+<%- include('partials/nav') %>
+
+<div class="container py-4" style="max-width: 920px;">
+  <h1 class="h4 mb-3"><%= mode==='create' ? 'Cadastrar conta' : 'Editar conta' %></h1>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <form method="post" action="/bills/new" enctype="multipart/form-data" class="card shadow-sm">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label">Loja</label>
+          <select class="form-select" name="store_id" required>
+            <% stores.forEach(s => { %>
+              <option value="<%= s.id %>" <%= (bill && String(bill.store_id)===String(s.id)) ? 'selected' : '' %>><%= s.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Vencimento</label>
+          <input class="form-control" type="date" name="due_date" value="<%= bill ? bill.due_date : '' %>" required />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Nome do débito</label>
+          <input class="form-control" name="title" value="<%= bill ? bill.title : '' %>" placeholder="Ex: Aluguel, Energia, Fornecedor X" required />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Motivo / Categoria</label>
+          <input class="form-control" name="reason" value="<%= bill ? (bill.reason || '') : '' %>" placeholder="Ex: Despesa fixa, Compra mercadoria, Serviço" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Valor (R$)</label>
+          <input class="form-control" name="amount" value="<%= bill ? (bill.amount || '') : '' %>" placeholder="Ex: 1.234,56" />
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label">Forma de pagamento</label>
+          <select class="form-select" name="payment_method">
+            <option value="BOLETO">Boleto</option>
+            <option value="PIX">Pix</option>
+            <option value="OUTRO">Outro</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-8">
+          <label class="form-label">Código de barras (boleto)</label>
+          <input class="form-control" name="barcode" value="<%= bill ? (bill.barcode || '') : '' %>" placeholder="Cole aqui o código de barras" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Pix (chave/copia e cola)</label>
+          <input class="form-control" name="pix_key" value="<%= bill ? (bill.pix_key || '') : '' %>" placeholder="Chave Pix ou Pix Copia e Cola" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Anexo (boleto / nota fiscal)</label>
+          <input class="form-control" type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png" />
+          <div class="form-text">Até 15MB. Formatos: PDF, JPG, PNG.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Observações</label>
+          <textarea class="form-control" name="notes" rows="3"><%= bill ? (bill.notes || '') : '' %></textarea>
+        </div>
+
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="urgent_today" id="urgent" value="1" <%= bill && bill.urgent_today ? 'checked' : '' %> />
+            <label class="form-check-label" for="urgent">Débito do dia (URGENTE)</label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <a class="btn btn-outline-secondary" href="/bills">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/foot') %>

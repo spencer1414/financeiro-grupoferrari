@@ -1,0 +1,52 @@
+<%- include('partials/head', { title: 'Admin - Lojas' }) %>
+<%- include('partials/nav') %>
+
+<div class="container py-4" style="max-width: 980px;">
+  <h1 class="h4 mb-3">Admin • Lojas</h1>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-header">Cadastrar nova loja</div>
+    <div class="card-body">
+      <form class="row g-2" method="post" action="/admin/stores">
+        <div class="col-12 col-md-5">
+          <label class="form-label">Nome</label>
+          <input class="form-control" name="name" placeholder="Ex: TXC Centro" required />
+        </div>
+        <div class="col-12 col-md-5">
+          <label class="form-label">Email da loja (opcional)</label>
+          <input class="form-control" name="email" type="email" placeholder="loja@empresa.com" />
+        </div>
+        <div class="col-12 col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100" type="submit">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header">Lojas cadastradas</div>
+    <div class="card-body table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr><th>ID</th><th>Nome</th><th>Email</th><th>Criada em</th></tr>
+        </thead>
+        <tbody>
+          <% stores.forEach(s => { %>
+            <tr>
+              <td><%= s.id %></td>
+              <td><%= s.name %></td>
+              <td><%= s.email || '-' %></td>
+              <td><%= s.created_at %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,93 @@
+<%- include('../partials/head', { title }) %>
+<%- include('../partials/nav') %>
+<div class="container py-4" style="max-width:900px">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Cadastrar conta</h3>
+    <a class="btn btn-outline-secondary" href="/bills">Voltar</a>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" action="/bills" enctype="multipart/form-data">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Loja</label>
+            <select class="form-select" name="store_id" <%= (user.role==='MANAGER' ? 'disabled' : '') %>>
+              <% stores.forEach(s => { %>
+                <option value="<%= s.id %>" <%= (user.store_id===s.id ? 'selected' : '') %>><%= s.name %></option>
+              <% }) %>
+            </select>
+            <% if (user.role === 'MANAGER') { %>
+              <input type="hidden" name="store_id" value="<%= user.store_id %>">
+            <% } %>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Data de vencimento</label>
+            <input class="form-control" type="date" name="due_date" required>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Nome do débito</label>
+            <input class="form-control" name="title" placeholder="Ex.: Aluguel, Energia, Fornecedor X" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Valor (opcional)</label>
+            <input class="form-control" name="amount" placeholder="Ex.: 1.234,56">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Motivo / descrição</label>
+            <input class="form-control" name="reason" placeholder="Ex.: aluguel do mês, reposição de estoque">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Forma de pagamento</label>
+            <select class="form-select" name="payment_method">
+              <option value="BOLETO">Boleto</option>
+              <option value="PIX">Pix</option>
+              <option value="OUTRO">Outro</option>
+            </select>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Código de barras (se boleto)</label>
+            <input class="form-control" name="barcode" placeholder="Digite/cole o código de barras">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Chave Pix (se pix)</label>
+            <input class="form-control" name="pix_key" placeholder="CPF/CNPJ/Telefone/E-mail/Chave aleatória">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Anexar boleto ou nota fiscal (PDF, imagem, etc.)</label>
+            <input class="form-control" type="file" name="attachment">
+          </div>
+
+          <div class="col-md-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="urgent_today" id="urgent_today">
+              <label class="form-check-label" for="urgent_today">
+                Débito do dia (urgente) — pagamentos que precisam ser feitos hoje.
+              </label>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control" name="notes" rows="3" placeholder="Opcional"></textarea>
+          </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+          <button class="btn btn-primary">Salvar</button>
+          <a class="btn btn-outline-secondary" href="/bills">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('../partials/foot') %>

@@ -1,0 +1,134 @@
+<%- include('../partials/head', { title }) %>
+<%- include('../partials/nav') %>
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h3 class="mb-0">Admin</h3>
+      <small class="text-muted">Cadastre lojas e usuários (Gerentes, Patrão e outros Admins).</small>
+    </div>
+    <a class="btn btn-outline-secondary" href="/owner">Abrir painel do patrão</a>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3">Cadastrar loja</h5>
+          <form method="post" action="/admin/stores">
+            <div class="mb-2">
+              <label class="form-label">Nome da loja</label>
+              <input class="form-control" name="name" placeholder="TXC Centro" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">E-mail da loja (para receber convite)</label>
+              <input class="form-control" name="email" type="email" placeholder="loja@...">
+            </div>
+            <button class="btn btn-primary">Salvar loja</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="mb-3">Criar usuário</h5>
+          <form method="post" action="/admin/users">
+            <div class="mb-2">
+              <label class="form-label">Nome</label>
+              <input class="form-control" name="name" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">E-mail (será o login)</label>
+              <input class="form-control" name="email" type="email" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Perfil</label>
+              <select class="form-select" name="role" required>
+                <option value="MANAGER">Gerente (apenas 1 loja)</option>
+                <option value="OWNER">Patrão (todas as lojas)</option>
+                <option value="ADMIN">Admin (tudo)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Loja (somente para Gerente)</label>
+              <select class="form-select" name="store_id">
+                <option value="">—</option>
+                <% stores.forEach(s => { %>
+                  <option value="<%= s.id %>"><%= s.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <button class="btn btn-primary">Criar e enviar acesso</button>
+            <div class="text-muted mt-2" style="font-size:13px">
+              Se SMTP não estiver configurado, o convite aparece no terminal como "EMAIL SIMULADO".
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3">Lojas cadastradas</h5>
+          <% if (stores.length === 0) { %>
+            <div class="text-muted">Nenhuma loja cadastrada ainda.</div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Loja</th>
+                    <th>E-mail</th>
+                    <th>Criada em</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% stores.forEach(s => { %>
+                    <tr>
+                      <td><%= s.id %></td>
+                      <td><%= s.name %></td>
+                      <td><%= s.email || '' %></td>
+                      <td><%= s.created_at %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="mb-3">Usuários</h5>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Perfil</th>
+                  <th>Loja</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% users.forEach(u => { %>
+                  <tr>
+                    <td><%= u.name %></td>
+                    <td><%= u.email %></td>
+                    <td><span class="badge text-bg-secondary"><%= u.role %></span></td>
+                    <td><%= u.store_name || '' %></td>
+                    <td><%= u.is_active ? 'Ativo' : 'Inativo' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/foot') %>

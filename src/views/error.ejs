@@ -1,0 +1,10 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/nav') %>
+<div class="container py-4">
+  <div class="alert alert-warning">
+    <h4 class="mb-1"><%= title %></h4>
+    <div><%= message %></div>
+  </div>
+  <a href="/" class="btn btn-outline-secondary">Voltar</a>
+</div>
+<%- include('partials/foot') %>

@@ -1,0 +1,66 @@
+<%- include('partials/head', { title: 'Contas' }) %>
+<%- include('partials/nav') %>
+
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h4 m-0">Contas</h1>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary btn-sm" href="/export.xlsx<%= filters.month ? ('?month=' + filters.month) : '' %>">Exportar Excel</a>
+      <a class="btn btn-primary btn-sm" href="/bills/new">+ Nova</a>
+    </div>
+  </div>
+
+  <form class="row g-2 align-items-end mb-3" method="get" action="/bills">
+    <div class="col-12 col-md-3">
+      <label class="form-label">Status</label>
+      <select class="form-select" name="status">
+        <option value="OPEN" <%= filters.status==='OPEN'?'selected':'' %>>Abertas</option>
+        <option value="PAID" <%= filters.status==='PAID'?'selected':'' %>>Pagas</option>
+        <option value="CANCELLED" <%= filters.status==='CANCELLED'?'selected':'' %>>Canceladas</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label">Mês de vencimento (YYYY-MM)</label>
+      <input class="form-control" name="month" placeholder="2026-01" value="<%= filters.month || '' %>" />
+    </div>
+    <div class="col-12 col-md-2">
+      <button class="btn btn-outline-primary w-100" type="submit">Filtrar</button>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Loja</th>
+          <th>Débito</th>
+          <th>Venc.</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% bills.forEach(b => { %>
+          <tr>
+            <td><%= b.store_name %></td>
+            <td>
+              <div class="fw-semibold"><%= b.title %></div>
+              <div class="small text-muted"><%= b.reason || '' %></div>
+            </td>
+            <td><span class="badge bg-dark"><%= b.due_date %></span> <% if (b.urgent_today) { %><span class="badge bg-danger ms-1">URGENTE</span><% } %></td>
+            <td><%= centsToBRL(b.amount_cents) %></td>
+            <td><span class="badge <%= b.status==='OPEN'?'bg-primary':(b.status==='PAID'?'bg-success':'bg-secondary') %>"><%= b.status %></span></td>
+            <td><a class="btn btn-sm btn-outline-primary" href="/bills/<%= b.id %>">Abrir</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (bills.length === 0) { %>
+    <div class="text-muted">Nenhum registro encontrado.</div>
+  <% } %>
+</div>
+
+<%- include('partials/foot') %>

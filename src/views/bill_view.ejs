@@ -1,0 +1,99 @@
+<%- include('partials/head', { title: 'Conta' }) %>
+<%- include('partials/nav') %>
+
+<div class="container py-4" style="max-width: 980px;">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h1 class="h4 m-0"><%= bill.title %></h1>
+      <div class="text-muted"><%= bill.store_name %> • Cadastrado por <%= bill.created_by_name %> • <%= bill.created_at %></div>
+    </div>
+    <div class="text-end">
+      <span class="badge <%= bill.status==='OPEN'?'bg-primary':(bill.status==='PAID'?'bg-success':'bg-secondary') %>"><%= bill.status %></span>
+      <% if (bill.urgent_today) { %> <span class="badge bg-danger">URGENTE HOJE</span> <% } %>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-12 col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="text-muted small">Vencimento</div>
+              <div class="fw-semibold"><%= bill.due_date %></div>
+              <div class="small"><span class="badge bg-dark"><%= days %> dias</span></div>
+            </div>
+            <div class="col-6">
+              <div class="text-muted small">Valor</div>
+              <div class="fw-semibold"><%= centsToBRL(bill.amount_cents) %></div>
+            </div>
+            <div class="col-12">
+              <div class="text-muted small">Motivo</div>
+              <div><%= bill.reason || '-' %></div>
+            </div>
+            <div class="col-12">
+              <div class="text-muted small">Forma de pagamento</div>
+              <div><%= bill.payment_method %></div>
+            </div>
+            <div class="col-12">
+              <div class="text-muted small">Código de barras</div>
+              <div class="font-monospace"><%= bill.barcode || '-' %></div>
+            </div>
+            <div class="col-12">
+              <div class="text-muted small">Pix</div>
+              <div class="font-monospace"><%= bill.pix_key || '-' %></div>
+            </div>
+            <div class="col-12">
+              <div class="text-muted small">Observações</div>
+              <div style="white-space: pre-wrap;"><%= bill.notes || '-' %></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer d-flex flex-wrap gap-2 justify-content-end">
+          <% if (bill.status === 'OPEN') { %>
+            <form method="post" action="/bills/<%= bill.id %>/pay" class="m-0">
+              <button class="btn btn-success" type="submit">Marcar como paga</button>
+            </form>
+          <% } %>
+          <% if (currentUser.role === 'ADMIN' || currentUser.role === 'OWNER') { %>
+            <% if (bill.status !== 'CANCELLED') { %>
+              <form method="post" action="/bills/<%= bill.id %>/cancel" class="m-0">
+                <button class="btn btn-outline-danger" type="submit">Cancelar</button>
+              </form>
+            <% } %>
+          <% } %>
+          <a class="btn btn-outline-secondary" href="/bills">Voltar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-header">Anexos</div>
+        <div class="card-body">
+          <% if (!attachments || attachments.length === 0) { %>
+            <div class="text-muted">Sem anexos.</div>
+          <% } else { %>
+            <ul class="list-group">
+              <% attachments.forEach(a => { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold"><%= a.original_name %></div>
+                    <div class="small text-muted"><%= a.created_at %></div>
+                  </div>
+                  <a class="btn btn-sm btn-outline-primary" target="_blank" href="/uploads/<%= a.storage_name %>">Abrir</a>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        Dica: no painel do patrão (OWNER) você vê tudo organizado por vencimento e com lembretes das contas que vencem hoje ou em até 2 dias.
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>
